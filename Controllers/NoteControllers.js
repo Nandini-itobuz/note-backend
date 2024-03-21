@@ -1,102 +1,130 @@
-import noteSchema from '../Schema.js'
+import noteSchema from "../Schemas/NoteSchema.js";
 
-
-async function getAllData(){
-    try {
-       return await noteSchema.find();
-      } catch (e) {
-        console.log(e.message);
-      }
+export async function getAllNote(req, res) {
+  const allNoteData = await noteSchema.find({userId : req.idUser});
+  res.status(200).json({
+    data: allNoteData,
+    message: "View all data",
+    status: 200,
+  });
 }
 
-async function updateOldData(noteId, noteDetails){
-    try {
-        const {note,title} = noteDetails;
-        const foundData = await noteSchema.findByIdAndUpdate({_id : noteId}, {note:note, title : title})
-        return foundData;
-       } catch (e) {
-         console.log(e.message);
-       }
-}
-
-async function insertNewData(newNote,newTitle){
-    try {
-        const noteX = await noteSchema.create({
-          note: newNote,
-          title: newTitle,
-        });
-      } catch (e) {
-        console.log(e.message);
-      }
-}
-
-async function searchData(noteId){
-    try{
-        return await noteSchema.findById(noteId);
-    }catch(e){
-        console.log(e.message)
-    }
-}
-
-
-
-
-export async function getAllNote(req,res){
-    const allNoteData = await getAllData();
+export async function updateNote(req, res) {
+  try {
+    const { note, title } = req.body;
+    const foundData = await noteSchema.findOneAndUpdate(
+      { _id: req.params["id"],userId : req.idUser },
+      { note: note, title: title },
+      { new: true }
+    );
+    if (!foundData) throw new Error("not updated");
     res.status(200).json({
-        data : allNoteData,
-        message: "View all data",
-        status: 200
-    })
+      data: foundData,
+      message: "Successfully updated",
+      status: 200,
+    });
+  } catch (e) {
+    res.status(400).json({ data: null, message: e.message, status: 400 });
+  }
 }
 
-
-export async function updateNote (req,res){
-    const updatedData = await updateOldData(req.params['id'],req.body);
+export async function insertNote(req, res) {
+  try {
+    const noteX = new noteSchema({
+      note: req.body.note,
+      title: req.body.title,
+      userId: req.idUser
+    });
+    await noteX.save();
+    console.log(noteX, req.idUser)
+    if (!noteX) throw new Error("Unable to insert note");
     res.status(200).json({
-        data:updatedData,
-        message: "Successfully updated",
-        status: 200
-    })
+      data: noteX,
+      message: "Successfully added",
+      status: 200,
+    });
+  } catch (e) {
+    console.log(e.message);
+  }
 }
 
-export async function insertNote (req,res){
-    insertNewData(req.body.note,req.body.title);
+export async function searchNotes(req, res) {
+  try {
+    const searchNote = await noteSchema.findOne({userId : req.idUser ,_id:req.params["id"]});
+    if (!searchNote) throw new Error("data not found!");
     res.status(200).json({
-        data:req.body,
-        message: "Successfully added",
-        status: 200
-    })
+      data: searchNote,
+      message: "Successfully found",
+      status: 200,
+    });
+  } catch (e) {
+    res.status(404).json({
+      data: null,
+      message: e.message,
+      status: 404,
+    });
+  }
 }
 
-
-export async function searchNotes (req,res){
-    const searchNote = await searchData(req.params['id']);
+export async function deletedNotes(req, res) {
+  try {
+    const deletedNote = await noteSchema.findOneAndDelete({_id : req.params["id"],userId : req.idUser});
+    if (!deletedNote) throw new Error("unable to delete note");
     res.status(200).json({
-        data: searchNote,
-        message: "Successfully found",
-        status: 200
-    })
+      data: deletedNote,
+      message: "Successfully deleted",
+      status: 200,
+    });
+  } catch (e) {
+    res.status(404).json({
+      data: null,
+      message: e.message,
+      status: 404,
+    });
+  }
 }
 
-
-export async function deletedNotes (req,res){
-    try{
-        const deletedNote = await noteSchema.findByIdAndDelete(req.params['id']);
-        if(!deletedNote){
-            res.status(404).json({
-                message: "Uanble to delete the note",
-                status: 404
-            })
-        }
-        res.status(200).json({
-            message: "Successfully deleted",
-            status: 200
-        })
-    }catch(e){
-        console.log("Failed to delete the data!")
-    }
-    
+export async function searchByName(req, res) {
+  try {
+    let titleToSearch = req.query.name;
+    titleToSearch=titleToSearch.trim();
+    if(titleToSearch === "") throw new Error(`Check your String`)
+    const foundNote = await noteSchema.find({ title: titleToSearch, userId : req.idUser });
+    if(foundNote.length === 0) throw new Error(`No data found with ${titleToSearch}`)
+    res.status(200).json({
+      data: foundNote,
+      message: "Data found",
+      status: 200,
+    });
+  } catch (err) {
+    res.status(400).json({
+      data: null,
+      message: err.message,
+      status: 400,
+    });
+  }
 }
 
+export async function showUpdatedData(req, res) {
+  try {
 
+   const data =await noteSchema.find({userId : req.idUser});
+    const sortedData = data.filter(ele => ele.createdAt < ele.updatedAt).sort((a,b)=>b.updatedAt - a.updatedAt);
+    if (sortedData.length === 0) throw new Error("No data to sort");
+    res.status(200).json({
+      data: sortedData.slice(0,3),
+      message: "Last 3 updated data",
+      status: 200,
+    });
+  } catch (err) {
+    res.status(400).json({
+      data: null,
+      message: err.message,
+      status: 400,
+    });
+  }
+}
+
+export async function showSoftDelete(req, res) {
+  const arrayData = req.body;
+}
