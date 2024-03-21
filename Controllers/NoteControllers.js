@@ -38,10 +38,7 @@ async function searchData(noteId){
     }
 }
 
-async function deleteData(noteId){
-    const deletedNote = await noteSchema.findByIdAndDelete(noteId);
-    console.log(deletedNote);
-}
+
 
 
 export async function getAllNote(req,res){
@@ -84,11 +81,22 @@ export async function searchNotes (req,res){
 
 
 export async function deletedNotes (req,res){
-    deleteData(req.params['id']);
-    res.status(200).json({
-        message: "Successfully deleted",
-        status: 200
-    })
+    try{
+        const deletedNote = await noteSchema.findByIdAndDelete(req.params['id']);
+        if(!deletedNote){
+            res.status(404).json({
+                message: "Uanble to delete the note",
+                status: 404
+            })
+        }
+        res.status(200).json({
+            message: "Successfully deleted",
+            status: 200
+        })
+    }catch(e){
+        console.log("Failed to delete the data!")
+    }
+    
 }
 
 
