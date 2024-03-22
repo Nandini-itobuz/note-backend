@@ -168,3 +168,21 @@ export async function showSoftDeleteTrue(req,res){
     })
   }
 }
+
+export async function deleteMultiple(req,res){
+  try {
+    const arrayData = req.body.ids;
+    const deleteNotes = await noteSchema.deleteMany({ _id: { $in: arrayData },userId: req.idUser});
+    res.status(200).json({
+      data: deleteNotes,
+      message: "Visibility Updated",
+      status: 200
+    })
+  }catch(e){
+    res.status(400).json({
+      data: null,
+      message: e.message,
+      status: 404
+    })
+  }
+}
