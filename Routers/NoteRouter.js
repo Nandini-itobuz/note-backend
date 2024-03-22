@@ -8,7 +8,8 @@ import {
   deletedNotes,
   searchByName,
   showUpdatedData,
-  showSoftDelete
+  showSoftDeleteAll,
+  showSoftDeleteTrue
 } from "../Controllers/NoteControllers.js";
 export const noteRouter = express.Router();
 
@@ -32,4 +33,5 @@ noteRouter.route("/search/:id").post(searchNotes);
 noteRouter.route("/delete/:id").delete(deletedNotes);
 noteRouter.route("/search-by-name").get(searchByName);
 noteRouter.route("/last-updated").get(showUpdatedData);
-noteRouter.route("/get-soft-delete").post(showSoftDelete)
+noteRouter.route("/get-soft-delete-all").post(showSoftDeleteAll)
+noteRouter.route("/get-soft-delete-true").get(showSoftDeleteTrue)

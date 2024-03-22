@@ -39,12 +39,18 @@ export async function findData(req, res) {
   }
 }
 
+function validateEmail(userEmail){
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(userEmail);
+}
+
 export async function insertData(req, res) {
   try {
     const nameUser = req.body.name;
     const emailUser = req.body.email;
     const passwordUser = req.body.password;
-    console.log(nameUser);
+    console.log(emailUser);
+    console.log(validateEmail(emailUser));
 
     if (!nameUser || !emailUser || !passwordUser) {
       res.status(404).json({
@@ -53,6 +59,7 @@ export async function insertData(req, res) {
         status: 404,
       });
     }
+
     const user = await personModel.create({
       name: nameUser,
       email: emailUser,
@@ -70,4 +77,3 @@ export async function insertData(req, res) {
     console.log("error in inserting data");
   }
 }
-
