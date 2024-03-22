@@ -10,7 +10,8 @@ import {
   showUpdatedData,
   showSoftDeleteAll,
   showSoftDeleteTrue,
-  deleteMultiple
+  deleteMultiple,
+  defaultRoutes,
 } from "../Controllers/NoteControllers.js";
 export const noteRouter = express.Router();
 
@@ -32,8 +33,9 @@ noteRouter.route("/data").post(insertNote);
 noteRouter.route("/update/:id").put(updateNote);
 noteRouter.route("/search/:id").post(searchNotes);
 noteRouter.route("/delete/:id").delete(deletedNotes);
-noteRouter.route("/search-by-name").get(searchByName);
+noteRouter.route("/search-by-name").post(searchByName);
 noteRouter.route("/last-updated").get(showUpdatedData);
 noteRouter.route("/get-soft-delete-all").post(showSoftDeleteAll);
 noteRouter.route("/get-soft-delete-true").get(showSoftDeleteTrue);
-noteRouter.route("/delete-multiple").post(deleteMultiple)
+noteRouter.route("/delete-multiple").delete(deleteMultiple);
+noteRouter.route("*").all(defaultRoutes);

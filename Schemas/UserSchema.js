@@ -6,7 +6,14 @@ const personSchema = new Schema({
     email:{
         type:String,
         lowercase: true,
-        trim:true
+        trim:true,
+        validate:  {
+            validator : function (userEmail) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(userEmail);
+              },
+            message : ({value })=> `Invalid email ${value}`
+        }
     },
     password: {
         type :String,

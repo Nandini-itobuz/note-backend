@@ -1,10 +1,6 @@
 import personModel from "../Schemas/UserSchema.js";
 import jwt from "jsonwebtoken";
 
-function validateEmail(userEmail) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(userEmail);
-}
 
 export async function updateData(req, res) {
   try {
@@ -54,7 +50,6 @@ export async function insertData(req, res) {
     const passwordUser = req.body.password;
 
     const alreadyExists = await personModel.find({ email: emailUser });
-    if (validateEmail === false) throw new Error("Invalid E-mail Id");
     if (!nameUser || !emailUser || !passwordUser)
       throw new Error("Invalid input");
     if (alreadyExists.length > 0) throw new Error("Email already exists");
@@ -97,4 +92,12 @@ export async function deleteData(req, res) {
       status: 400,
     });
   }
+}
+
+export function defaultRoutes(req, res) {
+  res.status(400).json({
+    data: null,
+    message: "bad-gateway",
+    status: 404,
+  });
 }
