@@ -1,47 +1,50 @@
 import personModel from "../Schemas/UserSchema.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+
+function validateEmail(userEmail) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(userEmail);
+}
 
 export async function updateData(req, res) {
   try {
     const { name, email, password } = req.body;
+    console.log(req.body);
     const user = await personModel.findByIdAndUpdate(
       { _id: req.params["id"] },
       { name: name, email: email, password: password },
       { new: true }
     );
+    if (!user) throw new Error("Error in updating data");
     res.status(200).json({
-      data: updatedUser,
+      data: user,
       message: "Data Successfully updated!",
       status: 200,
     });
   } catch (e) {
-    console.log("Unable to update!");
+    res.status(404).json({
+      data: null,
+      message: e.message,
+      status: 404,
+    });
   }
 }
 
 export async function findData(req, res) {
   try {
     const findUser = await personModel.findById(req.params["id"]);
-    if (!findUser) {
-      res.status(404).send({
-        data: findUser,
-        message: "Data not found!",
-        status: 404,
-      });
-    }
     res.status(200).send({
       data: findUser,
       message: "Data Successfully found!",
       status: 200,
     });
   } catch (e) {
-    console.log("Data not found");
+    res.status(404).send({
+      data: null,
+      message: e.message,
+      status: 404,
+    });
   }
-}
-
-function validateEmail(userEmail){
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(userEmail);
 }
 
 export async function insertData(req, res) {
@@ -49,31 +52,49 @@ export async function insertData(req, res) {
     const nameUser = req.body.name;
     const emailUser = req.body.email;
     const passwordUser = req.body.password;
-    console.log(emailUser);
-    console.log(validateEmail(emailUser));
 
-    if (!nameUser || !emailUser || !passwordUser) {
-      res.status(404).json({
-        data: null,
-        message: "Unable to insert data",
-        status: 404,
-      });
-    }
+    const alreadyExists = await personModel.find({ email: emailUser });
+    if (validateEmail === false) throw new Error("Invalid E-mail Id");
+    if (!nameUser || !emailUser || !passwordUser)
+      throw new Error("Invalid input");
+    if (alreadyExists.length > 0) throw new Error("Email already exists");
 
     const user = await personModel.create({
       name: nameUser,
       email: emailUser,
       password: passwordUser,
     });
-
-    const token = jwt.sign({id: user._id},"ok");
-    
+    const token = jwt.sign({ id: user._id }, "ok");
     res.status(404).json({
-      data:token,
+      data: token,
       message: "Data inserted succesfully",
       status: 200,
     });
   } catch (e) {
-    console.log("error in inserting data");
+    res.status(404).json({
+      data: null,
+      message: e.message,
+      status: 404,
+    });
+  }
+}
+
+export async function deleteData(req, res) {
+  try {
+    const deletedUser = await personModel.findByIdAndDelete({
+      _id: req.params["id"],
+    });
+    if (!deletedUser) throw new Error("Unable to delete user");
+    res.status(200).json({
+      data: deletedUser,
+      message: "Successfully deleted",
+      status: 200,
+    });
+  } catch (e) {
+    res.status(400).json({
+      data: null,
+      message: e.message,
+      status: 400,
+    });
   }
 }

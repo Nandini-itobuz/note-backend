@@ -27,8 +27,8 @@ noteRouter.use((req, res, next) => {
 });
 
 noteRouter.route("/").get(getAllNote);
-noteRouter.route("/update/:id").put(updateNote);
 noteRouter.route("/data").post(insertNote);
+noteRouter.route("/update/:id").put(updateNote);
 noteRouter.route("/search/:id").post(searchNotes);
 noteRouter.route("/delete/:id").delete(deletedNotes);
 noteRouter.route("/search-by-name").get(searchByName);
