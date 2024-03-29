@@ -1,11 +1,12 @@
 import Cards from "./Cards";
 import EditModal from "./EditModal";
 import React,{useRef} from "react";
+import { useNavigate } from "react-router-dom";
 
 
-
-const Header = ({ notes, handleSingleDelete, handleUpdate, handleNewNote }) => {
+const Header = ({ notes, handleSingleDelete, handleUpdate, handleNewNote,setAllNotes }) => {
   const newNote = useRef();
+  const navigate = useNavigate();
   let currTime = new Date().getHours();
 
   let greeting;
@@ -21,11 +22,11 @@ const Header = ({ notes, handleSingleDelete, handleUpdate, handleNewNote }) => {
 
   }
 
-
-
-
-
-
+  const logout = () =>{
+    localStorage.setItem("token", "");
+    setAllNotes([]);
+    navigate('/login')
+  }
 
   return (
     <>
@@ -34,6 +35,7 @@ const Header = ({ notes, handleSingleDelete, handleUpdate, handleNewNote }) => {
         <button className="search-box"  ref={newNote}  onClick={()=>newNote.current.openModal()}>+</button>
         <EditModal ref={newNote} handleFunction={handleNewNote} />
         <p className="greeting" >{greeting}, Name</p>
+        <button onClick={() =>{logout()}} >Logout</button>
       </div>
 
       <div className="main-container">

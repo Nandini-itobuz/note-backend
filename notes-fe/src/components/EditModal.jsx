@@ -5,8 +5,8 @@ import { useState } from 'react'
 const EditModal = forwardRef(({title, noteDesc,handleFunction,id},ref) => {
 
     const [modalIsOpen, setIsOpen] = React.useState(false);
-    const [titleEdit, setTitleEdit] = React.useState(title || "title")
-    const [noteEdit, setNoteEdit] = React.useState(noteDesc || 'note')
+    const [titleEdit, setTitleEdit] = React.useState(title || "")
+    const [noteEdit, setNoteEdit] = React.useState(noteDesc || "")
 
 
     function openModal() {

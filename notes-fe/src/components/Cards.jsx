@@ -8,7 +8,6 @@ import EditModal from "./EditModal";
 const Cards = ({ title, noteDesc, dateCreated, handleSingleDelete, id,handleUpdate }) => {
   
     const btnEdit = useRef();
-    console.log(dateCreated)
 
     return (
         <>
